@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: calico-ipsec-node
-  namespace: kube-system
+  namespace: calico-system
   labels:
     k8s-app: calico-ipsec-node
 spec:
@@ -16,8 +16,8 @@ spec:
       labels:
         k8s-app: calico-ipsec-node
       annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      priorityClassName: system-node-critical
       tolerations:
       - operator: Exists
         effect: NoSchedule
@@ -36,7 +36,7 @@ spec:
           secretName: calico-ipsec
       containers:
       - name: ipsec
-        image: adohkan/calico-ipsec
+        image: quay.io/coutinho/calico-ipsec
         volumeMounts:
         - name: ipsec-conf
           mountPath: /etc/calico-ipsec-conf
@@ -64,7 +64,7 @@ spec:
           capabilities:
             add: ["NET_ADMIN"]
       - name: build-ipsec-conf
-        image: adohkan/calico-ipsec
+        image: quay.io/coutinho/calico-ipsec
         volumeMounts:
         - name: ipsec-conf
           mountPath: /etc/calico-ipsec-conf
@@ -77,7 +77,7 @@ spec:
         # uncomment for VXLAN
         #  value: "[udp/8472]"
         #- name: IPSEC_AUTO_PARAM
-        #  value: "add"
+        #  value: "route"
         command:
         - /sbin/tini
         args:
